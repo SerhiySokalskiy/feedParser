@@ -10,7 +10,7 @@ export type AppOptions = Partial<FastifyServerOptions>;
 async function buildApp(options: AppOptions = {}) {
 	const fastify = Fastify({ logger: true });
 	await fastify.register(configPlugin);
-	
+
 	try {
 		fastify.decorate("pluginLoaded", (pluginName: string) => {
 			fastify.log.info(`✅ Plugin loaded: ${pluginName}`);
@@ -32,10 +32,10 @@ async function buildApp(options: AppOptions = {}) {
 	fastify.register(prismaPlugin);
 
 	await fastify.register(AutoLoad, {
-    	dir: join(__dirname, 'modules'),
-    	options: { prefix: '/' },
-  	});
-	
+		dir: join(__dirname, "modules"),
+		options: { prefix: "/" },
+	});
+
 	fastify.get("/", async () => {
 		return { hello: "world" };
 	});
@@ -43,8 +43,6 @@ async function buildApp(options: AppOptions = {}) {
 	fastify.register(getFeedDataRoutes);
 
 	return fastify;
-
-
 }
 
 export default buildApp;
