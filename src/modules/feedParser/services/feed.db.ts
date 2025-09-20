@@ -16,7 +16,11 @@ export async function saveFeedToDB(prisma: PrismaClient, feedData: FeedItem[]) {
 export async function getFeedFromDB(prisma: PrismaClient): Promise<FeedItem[]> {
 	const records = await prisma.feed.findMany();
 
-	return records.map((r) => ({
+	type FeedRecord = Awaited<
+		ReturnType<PrismaClient["feed"]["findMany"]>
+	>[number];
+
+	return records.map((r: FeedRecord) => ({
 		title: r.title,
 		contentSnippet: r.text,
 		pubDate: r.date.toISOString(),
