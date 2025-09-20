@@ -1,4 +1,4 @@
-import type { Feed, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import type { FeedItem } from "../types/types";
 
 export async function saveFeedToDB(prisma: PrismaClient, feedData: FeedItem[]) {
@@ -14,7 +14,8 @@ export async function saveFeedToDB(prisma: PrismaClient, feedData: FeedItem[]) {
 }
 
 export async function getFeedFromDB(prisma: PrismaClient): Promise<FeedItem[]> {
-	const records: Feed[] = await prisma.feed.findMany();
+	const records = await prisma.feed.findMany();
+	
 	return records.map((r) => ({
 		title: r.title,
 		contentSnippet: r.text,
