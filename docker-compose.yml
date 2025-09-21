@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: my_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    command: ["--replSet", "rs0"]
+    volumes:
+      - mongo_data_new:/data/db
+
+volumes:
+  mongo_data_new:
