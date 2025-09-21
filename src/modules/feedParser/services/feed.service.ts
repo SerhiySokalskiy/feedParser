@@ -1,5 +1,5 @@
 import Parser from "rss-parser";
-import type { FeedItem } from "../types/types";
+import type { FeedItem } from "../types/types.js";
 
 const parser = new Parser();
 

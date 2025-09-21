@@ -1,15 +1,32 @@
 import type { PrismaClient } from "@prisma/client";
-import type { FeedItem } from "../types/types";
+import type { FeedItem } from "../types/types.js";
 
 export async function saveFeedToDB(prisma: PrismaClient, feedData: FeedItem[]) {
 	for (const item of feedData) {
-		await prisma.feed.create({
-			data: {
+		const existing = await prisma.feed.findFirst({
+			where: {
 				title: item.title,
-				text: item.contentSnippet || "",
-				date: item.pubDate ? new Date(item.pubDate) : new Date(),
+				date: item.pubDate ? new Date(item.pubDate) : undefined,
 			},
 		});
+
+		if (existing) {
+			await prisma.feed.update({
+				where: { id: existing.id },
+				data: {
+					text: item.contentSnippet || "",
+					date: item.pubDate ? new Date(item.pubDate) : new Date(),
+				},
+			});
+		} else {
+			await prisma.feed.create({
+				data: {
+					title: item.title,
+					text: item.contentSnippet || "",
+					date: item.pubDate ? new Date(item.pubDate) : new Date(),
+				},
+			});
+		}
 	}
 }
 

@@ -1,15 +1,23 @@
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import AutoLoad from "@fastify/autoload";
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
-import configPlugin from "./config";
-import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route";
-import prismaPlugin from "./plugins/prisma";
+import configPlugin from "./config/index.js";
+import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
+import prismaPlugin from "./plugins/prisma.js";
 
 export type AppOptions = Partial<FastifyServerOptions>;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 async function buildApp(options: AppOptions = {}) {
-	const fastify = Fastify({ logger: true });
+	const fastify = Fastify({
+		logger: true,
+	}).withTypeProvider<TypeBoxTypeProvider>();
 	await fastify.register(configPlugin);
+	await fastify.register(prismaPlugin);
 
 	try {
 		fastify.decorate("pluginLoaded", (pluginName: string) => {
@@ -28,8 +36,6 @@ async function buildApp(options: AppOptions = {}) {
 		fastify.log.error("Error in autoload:", error);
 		throw error;
 	}
-
-	fastify.register(prismaPlugin);
 
 	await fastify.register(AutoLoad, {
 		dir: join(__dirname, "modules"),

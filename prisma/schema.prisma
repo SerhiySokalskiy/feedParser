@@ -16,7 +16,7 @@ datasource db {
 
 model Feed {
   id      String @id @map("_id") @default(auto()) @db.ObjectId
-  title   String
+  title   String 
   text    String
   date    DateTime
 }

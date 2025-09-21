@@ -1,9 +1,9 @@
 import fastifyEnv from "@fastify/env";
 import Ajv from "ajv";
-import ajvFormats from "ajv-formats";
+import addFormats from "ajv-formats";
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
-import { EnvSchema } from "./schema";
+import { EnvSchema } from "./schema.js";
 
 export default fp(
 	async (fastify: FastifyInstance) => {
@@ -15,13 +15,14 @@ export default fp(
 				data: process.env,
 				ajv: {
 					customOptions: () => {
-						const ajv = new Ajv({
+						const ajv = new Ajv.default({
+							// якщо TS все ще скаржиться, пробуй Ajv.default
 							allErrors: true,
 							removeAdditional: "all",
 							coerceTypes: true,
 							useDefaults: true,
 						});
-						ajvFormats(ajv);
+						addFormats.default(ajv);
 						return ajv;
 					},
 				},

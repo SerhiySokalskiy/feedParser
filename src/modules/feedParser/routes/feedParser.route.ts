@@ -1,18 +1,22 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { saveFeedToDB } from "../services/feed.db";
-import { parseFeed } from "../services/feed.service";
-import type { FeedItem } from "../types/types";
+import { saveFeedToDB } from "../services/feed.db.js";
+import { parseFeed } from "../services/feed.service.js";
+import {
+	type FeedItem,
+	type FeedQuery,
+	FeedQuerySchema,
+} from "../types/types.js";
 
 const DEFAULT_URL = "https://rss.nytimes.com/services/xml/rss/nyt/World.xml";
-
-interface FeedQuery {
-	url?: string;
-	force?: "0" | "1";
-}
 
 export async function getFeedDataRoutes(fastify: FastifyInstance) {
 	fastify.get(
 		"/feed",
+		{
+			schema: {
+				querystring: FeedQuerySchema,
+			},
+		},
 		async (
 			request: FastifyRequest<{ Querystring: FeedQuery }>,
 			reply: FastifyReply,
