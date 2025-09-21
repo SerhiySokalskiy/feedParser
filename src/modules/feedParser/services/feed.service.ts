@@ -7,9 +7,9 @@ export async function parseFeed(url: string): Promise<FeedItem[]> {
 	try {
 		const feed = await parser.parseURL(url);
 		return feed.items.map((item) => ({
+			url: item.link || "",
 			title: item.title || "No title",
 			contentSnippet: item.contentSnippet || item.content?.slice(0, 200),
-			link: item.link,
 			pubDate: item.pubDate,
 			image: item.enclosure?.url,
 		}));

@@ -13,3 +13,11 @@ export const schema = {
 		},
 	},
 } as const;
+export const FeedQuerySchema = {
+	type: "object",
+	properties: {
+		url: { type: "string", format: "uri" },
+		force: { type: "string", enum: ["0", "1"] },
+	},
+	additionalProperties: false,
+};

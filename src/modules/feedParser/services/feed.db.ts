@@ -1,45 +1,40 @@
-import type { PrismaClient } from "@prisma/client";
+import type { FastifyInstance } from "fastify";
 import type { FeedItem } from "../types/types.js";
 
-export async function saveFeedToDB(prisma: PrismaClient, feedData: FeedItem[]) {
+export async function saveFeedToDB(
+	fastify: FastifyInstance,
+	feedData: FeedItem[],
+) {
 	for (const item of feedData) {
-		const existing = await prisma.feed.findFirst({
-			where: {
+		await fastify.prisma.feed.upsert({
+			where: { url: item.url },
+			update: {
 				title: item.title,
-				date: item.pubDate ? new Date(item.pubDate) : undefined,
+				text: item.contentSnippet || "",
+				date: item.pubDate ? new Date(item.pubDate) : new Date(),
+				image: item.image,
+			},
+			create: {
+				url: item.url,
+				title: item.title,
+				text: item.contentSnippet || "",
+				date: item.pubDate ? new Date(item.pubDate) : new Date(),
+				image: item.image,
 			},
 		});
-
-		if (existing) {
-			await prisma.feed.update({
-				where: { id: existing.id },
-				data: {
-					text: item.contentSnippet || "",
-					date: item.pubDate ? new Date(item.pubDate) : new Date(),
-				},
-			});
-		} else {
-			await prisma.feed.create({
-				data: {
-					title: item.title,
-					text: item.contentSnippet || "",
-					date: item.pubDate ? new Date(item.pubDate) : new Date(),
-				},
-			});
-		}
 	}
 }
 
-export async function getFeedFromDB(prisma: PrismaClient): Promise<FeedItem[]> {
-	const records = await prisma.feed.findMany();
+export async function getFeedFromDB(
+	fastify: FastifyInstance,
+): Promise<FeedItem[]> {
+	const records = (await fastify.prisma.feed.findMany()) as FeedItem[];
 
-	type FeedRecord = Awaited<
-		ReturnType<PrismaClient["feed"]["findMany"]>
-	>[number];
-
-	return records.map((r: FeedRecord) => ({
+	return records.map((r) => ({
+		url: r.url,
 		title: r.title,
-		contentSnippet: r.text,
-		pubDate: r.date.toISOString(),
+		contentSnippet: r.contentSnippet,
+		pubDate: r.pubDate,
+		image: r.image,
 	}));
 }

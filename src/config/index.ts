@@ -16,7 +16,6 @@ export default fp(
 				ajv: {
 					customOptions: () => {
 						const ajv = new Ajv.default({
-							// якщо TS все ще скаржиться, пробуй Ajv.default
 							allErrors: true,
 							removeAdditional: "all",
 							coerceTypes: true,

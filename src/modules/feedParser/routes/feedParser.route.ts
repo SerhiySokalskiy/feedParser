@@ -1,49 +1,53 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { saveFeedToDB } from "../services/feed.db.js";
 import { parseFeed } from "../services/feed.service.js";
-import {
-	type FeedItem,
-	type FeedQuery,
-	FeedQuerySchema,
-} from "../types/types.js";
-
-const DEFAULT_URL = "https://rss.nytimes.com/services/xml/rss/nyt/World.xml";
+import type { FeedItem } from "../types/types.js";
 
 export async function getFeedDataRoutes(fastify: FastifyInstance) {
 	fastify.get(
 		"/feed",
 		{
 			schema: {
-				querystring: FeedQuerySchema,
+				querystring: {
+					type: "object",
+					properties: {
+						url: { type: "string", format: "uri" },
+						force: { type: "string", enum: ["0", "1"] },
+					},
+					additionalProperties: false,
+				},
 			},
 		},
 		async (
-			request: FastifyRequest<{ Querystring: FeedQuery }>,
+			request: FastifyRequest<{
+				Querystring: { url?: string; force?: "0" | "1" };
+			}>,
 			reply: FastifyReply,
 		) => {
-			const url = request.query.url ?? DEFAULT_URL;
+			const url = request.query.url ?? fastify.config.DEFAULT_FEED_URL;
 			const force = request.query.force === "1";
 
 			try {
 				let feed: FeedItem[] = [];
 
 				if (!force) {
-					feed = await fastify.prisma.feed.findMany({
+					const feedFromDB = await fastify.prisma.feed.findMany({
 						orderBy: { date: "desc" },
 					});
 
-					if (feed.length > 0) {
-						return reply.status(200).send({ feed });
+					if (feedFromDB.length > 0) {
+						return reply.status(200).send({ feed: feedFromDB });
 					}
 				}
 
 				feed = await parseFeed(url);
 
-				saveFeedToDB(fastify.prisma, feed).catch((err) =>
-					fastify.log.error({ err }, "Error saving feed to DB"),
-				);
+				await saveFeedToDB(fastify, feed);
 
-				return reply.status(200).send({ feed });
+				const feedFromDB = await fastify.prisma.feed.findMany({
+					orderBy: { date: "desc" },
+				});
+				return reply.status(200).send({ feed: feedFromDB });
 			} catch (error) {
 				const message =
 					error instanceof Error ? error.message : "Internal Server Error";
