@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { parseArticle } from "../services/cheerio.service.js";
 import { saveFeedToDB } from "../services/feed.db.js";
 import { parseFeed } from "../services/feed.service.js";
 import type { FeedItem } from "../types/types.js";
@@ -52,6 +53,70 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
 				const message =
 					error instanceof Error ? error.message : "Internal Server Error";
 				fastify.log.error("Feed endpoint error:", error);
+				return reply.status(500).send({ error: message });
+			}
+		},
+	);
+
+	fastify.get(
+		"/feed/:id",
+		{
+			schema: {
+				params: {
+					type: "object",
+					properties: {
+						id: { type: "string" },
+					},
+					required: ["id"],
+					additionalProperties: false,
+				},
+				response: {
+					200: {
+						type: "object",
+						properties: {
+							title: { type: "string" },
+							text: {
+								type: "array",
+								items: { type: "string" },
+							},
+							image: { type: "string", nullable: true },
+						},
+						required: ["title", "text"],
+					},
+					404: {
+						type: "object",
+						properties: {
+							message: { type: "string" },
+						},
+						required: ["message"],
+					},
+				},
+			},
+		},
+		async (
+			request: FastifyRequest<{ Params: { id: number } }>,
+			reply: FastifyReply,
+		) => {
+			try {
+				const { id } = request.params;
+
+				const feedItem = await fastify.prisma.feed.findUnique({
+					where: { id },
+				});
+
+				if (!feedItem) {
+					return reply
+						.status(404)
+						.send({ message: "There isnt such an article" });
+				}
+
+				const article = await parseArticle(feedItem.url);
+
+				return reply.status(200).send(article);
+			} catch (error) {
+				const message =
+					error instanceof Error ? error.message : "Internal Server Error";
+				fastify.log.error("Feed by id error:", error);
 				return reply.status(500).send({ error: message });
 			}
 		},

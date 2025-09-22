@@ -1,6 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import AutoLoad from "@fastify/autoload";
+import fastifyCors from "@fastify/cors";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
@@ -44,6 +45,10 @@ async function buildApp(options: AppOptions = {}) {
 
 	fastify.get("/", async () => {
 		return { hello: "world" };
+	});
+
+	await fastify.register(fastifyCors, {
+		origin: "*",
 	});
 
 	fastify.register(getFeedDataRoutes);
