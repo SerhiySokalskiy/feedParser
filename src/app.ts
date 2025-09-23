@@ -5,6 +5,7 @@ import fastifyCors from "@fastify/cors";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
+import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
 
@@ -52,6 +53,7 @@ async function buildApp(options: AppOptions = {}) {
 	});
 
 	fastify.register(getFeedDataRoutes);
+	fastify.register(authRoutes);
 
 	return fastify;
 }
