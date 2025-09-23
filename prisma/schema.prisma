@@ -22,3 +22,11 @@ model Feed {
   text  String
   date  DateTime
 }
+
+model User {
+  id       String   @id @map("_id") @default(auto()) @db.ObjectId
+  name     String
+  email    String   @unique
+  password String
+  createdAt DateTime @default(now())
+}

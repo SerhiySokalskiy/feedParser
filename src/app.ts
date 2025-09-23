@@ -2,9 +2,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import AutoLoad from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
+import fastifyJwt from "@fastify/jwt";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
+import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
 
@@ -19,6 +21,10 @@ async function buildApp(options: AppOptions = {}) {
 	}).withTypeProvider<TypeBoxTypeProvider>();
 	await fastify.register(configPlugin);
 	await fastify.register(prismaPlugin);
+
+	fastify.register(fastifyJwt, {
+		secret: process.env.JWT_SECRET || "secret_fallback",
+	});
 
 	try {
 		fastify.decorate("pluginLoaded", (pluginName: string) => {
@@ -52,6 +58,7 @@ async function buildApp(options: AppOptions = {}) {
 	});
 
 	fastify.register(getFeedDataRoutes);
+	fastify.register(authRoutes);
 
 	return fastify;
 }
