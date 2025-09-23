@@ -1,5 +1,5 @@
-import axios from "axios";
 import * as cheerio from "cheerio";
+import type { FastifyInstance } from "fastify";
 
 export interface ArticleData {
 	title: string;
@@ -7,19 +7,27 @@ export interface ArticleData {
 	image?: string;
 }
 
-export async function parseArticle(url: string): Promise<ArticleData> {
+export async function parseArticle(
+	fastify: FastifyInstance,
+	url: string,
+): Promise<ArticleData> {
 	try {
-		const { data: html } = await axios.get(url, {
+		const res = await fetch(url, {
 			headers: {
 				"User-Agent":
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117 Safari/537.36",
 			},
 		});
 
+		if (!res.ok) {
+			fastify.log.error(`Fetch error: ${res.status} ${res.statusText}`);
+			throw fastify.httpErrors.badGateway("Error fetching news");
+		}
+
+		const html = await res.text();
 		const $ = cheerio.load(html);
 
 		const title = $("h1").first().text().trim();
-
 		const container = $("div.article-text").first();
 
 		let image: string | undefined;
@@ -47,8 +55,8 @@ export async function parseArticle(url: string): Promise<ArticleData> {
 		});
 
 		return { title, image, text };
-	} catch (error) {
-		console.error("Parse article error:", error);
-		throw new Error("Не вдалося отримати статтю");
+	} catch (err) {
+		fastify.log.error({ err }, "Parse article error");
+		throw fastify.httpErrors.internalServerError("Error fetching article");
 	}
 }
