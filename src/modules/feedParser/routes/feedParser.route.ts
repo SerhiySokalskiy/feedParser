@@ -1,4 +1,9 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import {
+	getArticleByIdSchema,
+	getFeedSchema,
+} from "../schemas/getFeedData.schema.js";
+import { parseArticle } from "../services/cheerio.service.js";
 import { saveFeedToDB } from "../services/feed.db.js";
 import { parseFeed } from "../services/feed.service.js";
 import type { FeedItem } from "../types/types.js";
@@ -7,22 +12,13 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
 	fastify.get(
 		"/feed",
 		{
-			schema: {
-				querystring: {
-					type: "object",
-					properties: {
-						url: { type: "string", format: "uri" },
-						force: { type: "string", enum: ["0", "1"] },
-					},
-					additionalProperties: false,
-				},
-			},
+			schema: getFeedSchema,
 		},
 		async (
 			request: FastifyRequest<{
 				Querystring: { url?: string; force?: "0" | "1" };
 			}>,
-			reply: FastifyReply,
+			_reply: FastifyReply,
 		) => {
 			const url = request.query.url ?? fastify.config.DEFAULT_FEED_URL;
 			const force = request.query.force === "1";
@@ -36,7 +32,7 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
 					});
 
 					if (feedFromDB.length > 0) {
-						return reply.status(200).send({ feed: feedFromDB });
+						return { feed: feedFromDB };
 					}
 				}
 
@@ -47,12 +43,38 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
 				const feedFromDB = await fastify.prisma.feed.findMany({
 					orderBy: { date: "desc" },
 				});
-				return reply.status(200).send({ feed: feedFromDB });
-			} catch (error) {
-				const message =
-					error instanceof Error ? error.message : "Internal Server Error";
-				fastify.log.error("Feed endpoint error:", error);
-				return reply.status(500).send({ error: message });
+
+				return { feed: feedFromDB };
+			} catch (err) {
+				fastify.log.error("Feed endpoint error:", err);
+				throw fastify.httpErrors.internalServerError("Error fetching news");
+			}
+		},
+	);
+
+	fastify.get(
+		"/feed/:id",
+		{
+			schema: getArticleByIdSchema,
+		},
+		async (request: FastifyRequest<{ Params: { id: number } }>) => {
+			try {
+				const { id } = request.params;
+
+				const feedItem = await fastify.prisma.feed.findUnique({
+					where: { id },
+				});
+
+				if (!feedItem) {
+					throw fastify.httpErrors.notFound("There isnt such an article");
+				}
+
+				const article = await parseArticle(fastify, feedItem.url);
+
+				return article;
+			} catch (err) {
+				fastify.log.error("Feed by id error:", err);
+				throw fastify.httpErrors.internalServerError("Error fetching article");
 			}
 		},
 	);

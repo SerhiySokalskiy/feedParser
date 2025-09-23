@@ -17,6 +17,7 @@ datasource db {
 model Feed {
   id    String @id @map("_id") @default(auto()) @db.ObjectId
   url   String  @unique
+  image String?
   title String
   text  String
   date  DateTime
