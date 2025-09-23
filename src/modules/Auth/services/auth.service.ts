@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import type { FastifyInstance } from "fastify";
-import jwt from "jsonwebtoken";
 import type { LoginInput, RegistrationInput } from "../types/auth.types.js";
 
 export async function registerUser(
@@ -42,9 +41,8 @@ export async function loginUser(fastify: FastifyInstance, data: LoginInput) {
 		throw fastify.httpErrors.unauthorized("Invalid email or password");
 	}
 
-	const token = jwt.sign(
+	const token = fastify.jwt.sign(
 		{ userId: user.id, email: user.email },
-		fastify.config.JWT_SECRET || "secret_fallback",
 		{ expiresIn: "24h" },
 	);
 

@@ -7,12 +7,12 @@ export async function authRoutes(fastify: FastifyInstance) {
 	fastify.post(
 		"/auth/registration",
 		{ schema: registrationSchema },
-		async (request: FastifyRequest, reply: FastifyReply) => {
+		async (
+			request: FastifyRequest<{ Body: RegistrationInput }>,
+			reply: FastifyReply,
+		) => {
 			try {
-				const user = await registerUser(
-					fastify,
-					request.body as RegistrationInput,
-				);
+				const user = await registerUser(fastify, request.body);
 				return reply.status(201).send(user);
 			} catch (error) {
 				fastify.log.error("Registration error:", error);
