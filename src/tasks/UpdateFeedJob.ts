@@ -19,7 +19,9 @@ export function createFeedJob(fastify: FastifyInstance) {
 
 async function updateFeed() {
 	try {
-		const response = await fetch('http://localhost:3000/feed?url=https://rss.nytimes.com/services/xml/rss/nyt/World.xml&force=1');
+		const response = await fetch(
+			"http://localhost:3000/feed?url=https://rss.nytimes.com/services/xml/rss/nyt/World.xml&force=1",
+		);
 		if (!response.ok) {
 			throw new Error(`Feed update failed with status ${response.status}`);
 		}
