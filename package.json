@@ -11,7 +11,8 @@
     "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"tsc -w\" \"nodemon\"",
     "lint": "biome check ./src",
     "lint:fix": "biome check --write ./src",
-    "build": "tsc --noEmit"
+    "build": "tsc",
+    "start": "node build/index.js"
   },
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
