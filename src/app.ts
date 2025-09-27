@@ -3,12 +3,14 @@ import { fileURLToPath } from "node:url";
 import AutoLoad from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import fastifySchedule from "@fastify/schedule";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
+import { createFeedJob } from "./tasks/UpdateFeedJob.js";
 
 export type AppOptions = Partial<FastifyServerOptions>;
 
@@ -21,6 +23,7 @@ async function buildApp(options: AppOptions = {}) {
 	}).withTypeProvider<TypeBoxTypeProvider>();
 	await fastify.register(configPlugin);
 	await fastify.register(prismaPlugin);
+	await fastify.register(fastifySchedule);
 
 	fastify.register(fastifyJwt, {
 		secret: process.env.JWT_SECRET || "secret_fallback",
@@ -47,6 +50,12 @@ async function buildApp(options: AppOptions = {}) {
 	await fastify.register(AutoLoad, {
 		dir: join(__dirname, "modules"),
 		options: { prefix: "/" },
+	});
+
+	fastify.ready().then(() => {
+		const job = createFeedJob(fastify);
+		fastify.scheduler.addCronJob(job);
+		fastify.log.info("✅ Feed updater job scheduled (every hour)");
 	});
 
 	fastify.get("/", async () => {
