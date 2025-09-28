@@ -13,6 +13,9 @@ RUN npm install
 # Копіюємо весь код
 COPY . .
 
+RUN npx prisma generate
+RUN npm run build
+
 # Білд TypeScript
 RUN npm run build
 
