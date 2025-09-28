@@ -2,20 +2,18 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Копіюємо тільки package.json і lockfile
 COPY package*.json ./
 
-# Встановлюємо залежності
 RUN npm install
 
-# Копіюємо весь код
 COPY . .
 
-# Білд TypeScript
+# Спочатку генеруємо Prisma Client
+RUN npx prisma generate
+
+# Потім збираємо TypeScript
 RUN npm run build
 
-# Експортуємо порт Fastify
 EXPOSE 3000
 
-# Prisma generate + старт сервера вже після того, як є DATABASE_URL
-CMD npx prisma generate && npm start
+CMD ["npm", "start"]
