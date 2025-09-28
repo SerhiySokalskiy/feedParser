@@ -12,8 +12,7 @@
     "lint": "biome check ./src",
     "lint:fix": "biome check --write ./src",
     "build": "tsc",
-    "start": "node build/index.js",
-    "postinstall": "prisma generate"
+    "start": "node build/index.js"
   },
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
