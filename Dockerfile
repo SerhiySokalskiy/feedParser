@@ -1,14 +1,12 @@
-# Базовий образ Node
 FROM node:20-alpine
 
-# Робоча директорія
 WORKDIR /app
 
-# Копіюємо package.json і package-lock.json
+# Копіюємо тільки package.json і lockfile
 COPY package*.json ./
 
-# Встановлюємо залежності (включаючи dev, щоб був prisma)
-RUN npm install --include=dev
+# Встановлюємо залежності
+RUN npm install
 
 # Копіюємо весь код
 COPY . .
@@ -16,8 +14,8 @@ COPY . .
 # Білд TypeScript
 RUN npm run build
 
-# Генерація Prisma-клієнта (в runtime, після того як Render підставить DATABASE_URL)
-CMD npx prisma generate && npm start
-
-# Виставляємо порт Fastify
+# Експортуємо порт Fastify
 EXPOSE 3000
+
+# Prisma generate + старт сервера вже після того, як є DATABASE_URL
+CMD npx prisma generate && npm start
