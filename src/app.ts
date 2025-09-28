@@ -108,7 +108,6 @@ async function buildApp(options: AppOptions = {}) {
 
 	fastify.register(getFeedDataRoutes);
 	fastify.register(authRoutes);
-	fastify.register(getAdFormRoutes);
 
 	return fastify;
 }
