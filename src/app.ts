@@ -11,7 +11,6 @@ import fastifySwaggerUi from "@fastify/swagger-ui";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
-import { getAdFormRoutes } from "./modules/AdServer/AdForm/routes/adForm.route.js";
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
