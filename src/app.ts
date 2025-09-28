@@ -1,12 +1,17 @@
-import { dirname, join } from "node:path";
+import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import AutoLoad from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import fastifyMultipart from "@fastify/multipart";
 import fastifySchedule from "@fastify/schedule";
+import fastifyStatic from "@fastify/static";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
+import { getAdFormRoutes } from "./modules/AdServer/AdForm/routes/adForm.route.js";
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
@@ -21,9 +26,45 @@ async function buildApp(options: AppOptions = {}) {
 	const fastify = Fastify({
 		logger: true,
 	}).withTypeProvider<TypeBoxTypeProvider>();
+
 	await fastify.register(configPlugin);
 	await fastify.register(prismaPlugin);
 	await fastify.register(fastifySchedule);
+
+	await fastify.register(fastifySwagger);
+
+	await fastify.register(fastifySwaggerUi, {
+		routePrefix: "/documentation",
+		uiConfig: {
+			docExpansion: "full",
+			deepLinking: false,
+		},
+		uiHooks: {
+			onRequest: (_request, _reply, next) => {
+				next();
+			},
+			preHandler: (_request, _reply, next) => {
+				next();
+			},
+		},
+		staticCSP: true,
+		transformStaticCSP: (header) => header,
+		transformSpecification: (swaggerObject, _request, _reply) => {
+			return swaggerObject;
+		},
+		transformSpecificationClone: true,
+	});
+
+	fastify.register(fastifyMultipart, {
+		limits: {
+			fileSize: 10 * 1024 * 1024,
+		},
+	});
+
+	fastify.register(fastifyStatic, {
+		root: path.join(process.cwd(), "public"),
+		prefix: "/",
+	});
 
 	fastify.register(fastifyJwt, {
 		secret: process.env.JWT_SECRET || "secret_fallback",
@@ -68,6 +109,7 @@ async function buildApp(options: AppOptions = {}) {
 
 	fastify.register(getFeedDataRoutes);
 	fastify.register(authRoutes);
+	fastify.register(getAdFormRoutes);
 
 	return fastify;
 }
