@@ -4,6 +4,7 @@ import AutoLoad from "@fastify/autoload";
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 import fastifyMultipart from "@fastify/multipart";
+import fastifyRedis from "@fastify/redis";
 import fastifySchedule from "@fastify/schedule";
 import fastifyStatic from "@fastify/static";
 import fastifySwagger from "@fastify/swagger";
@@ -11,6 +12,8 @@ import fastifySwaggerUi from "@fastify/swagger-ui";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
+import { getAdFormRoutes } from "./modules/AdServer/AdForm/routes/adForm.route.js";
+import { getAdServerRoutes } from "./modules/AdServer/AdServerLogic/routes/adServer.route.js";
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
@@ -69,6 +72,11 @@ async function buildApp(options: AppOptions = {}) {
 		secret: process.env.JWT_SECRET || "secret_fallback",
 	});
 
+	fastify.register(fastifyRedis, {
+		host: "localhost",
+		port: 6379,
+	});
+
 	try {
 		fastify.decorate("pluginLoaded", (pluginName: string) => {
 			fastify.log.info(`✅ Plugin loaded: ${pluginName}`);
@@ -108,6 +116,8 @@ async function buildApp(options: AppOptions = {}) {
 
 	fastify.register(getFeedDataRoutes);
 	fastify.register(authRoutes);
+	fastify.register(getAdServerRoutes);
+	fastify.register(getAdFormRoutes);
 
 	return fastify;
 }

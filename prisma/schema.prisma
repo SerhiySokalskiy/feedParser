@@ -30,3 +30,15 @@ model User {
   password String
   createdAt DateTime @default(now())
 }
+
+model AdBid {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  size      String
+  minCPM    Float
+  maxCPM    Float
+  geo       String
+  adType    String
+  frequency Int
+  creative  String
+  createdAt DateTime @default(now())
+}

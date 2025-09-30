@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ad Bid Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <form 
+    action="/api/ad-bids" 
+    method="POST" 
+    enctype="multipart/form-data"
+    class="bg-white p-8 rounded-lg shadow-md w-full max-w-md space-y-6"
+  >
+    <h2 class="text-2xl font-bold text-gray-800 text-center">Create Ad Bid</h2>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Размер</label>
+      <input type="text" name="size" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Минимальный CPM</label>
+      <input type="number" name="minCPM" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Максимальный CPM</label>
+      <input type="number" name="maxCPM" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Geo</label>
+      <input type="text" name="geo" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Тип рекламы</label>
+      <select name="adType" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+        <option value="">Выберите тип</option>
+        <option value="banner">Баннер</option>
+        <option value="video">Видео</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Частота показов</label>
+      <input type="number" name="frequency" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 font-medium mb-1">Загрузить креатив</label>
+      <input type="file" name="creative" accept="image/*" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+    </div>
+
+    <div>
+      <button type="submit" class="w-full bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition-colors">Создать Bid</button>
+    </div>
+
+  </form>
+
+</body>
+</html>
