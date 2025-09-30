@@ -1,19 +1,16 @@
-FROM node:20-alpine
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-# Спочатку генеруємо Prisma Client
-RUN npx prisma generate
-
-# Потім збираємо TypeScript
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["npm", "start"]
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
