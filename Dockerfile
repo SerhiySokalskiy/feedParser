@@ -2,18 +2,24 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Копіюємо package.json і встановлюємо залежності
 COPY package*.json ./
-
 RUN npm install
 
+# Копіюємо код у контейнер
 COPY . .
 
-# Спочатку генеруємо Prisma Client
+# Генеруємо Prisma Client
 RUN npx prisma generate
 
-# Потім збираємо TypeScript
+# Збираємо TypeScript
 RUN npm run build
 
-EXPOSE 3000
+# Встановлюємо Redis із пакета Alpine
+RUN apk add --no-cache redis
 
-CMD ["npm", "start"]
+# Відкриваємо порти для API та Redis
+EXPOSE 3000 6379
+
+# Запускаємо Redis у фоні та Node API
+CMD sh -c "redis-server --appendonly yes & npm start"
