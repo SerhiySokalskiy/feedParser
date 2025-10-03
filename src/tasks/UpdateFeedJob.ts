@@ -12,7 +12,7 @@ export function createFeedJob(fastify: FastifyInstance) {
 		},
 	);
 
-	const job = new CronJob({ cronExpression: "0 * * * *" }, task);
+	const job = new CronJob({ cronExpression: "*/14 * * * *" }, task);
 
 	return job;
 }
@@ -20,7 +20,7 @@ export function createFeedJob(fastify: FastifyInstance) {
 async function updateFeed() {
 	try {
 		const response = await fetch(
-			"http://localhost:3000/feed?url=https://rss.nytimes.com/services/xml/rss/nyt/World.xml&force=1",
+			"http://localhost:3000/feed?url=https://rss.unian.net/site/news_ukr.rss&force=1",
 		);
 		if (!response.ok) {
 			throw new Error(`Feed update failed with status ${response.status}`);
