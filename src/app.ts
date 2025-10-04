@@ -10,6 +10,7 @@ import fastifyStatic from "@fastify/static";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import { metrics } from "@opentelemetry/api";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config/index.js";
 import { getAdFormRoutes } from "./modules/AdServer/AdForm/routes/adForm.route.js";
@@ -17,6 +18,7 @@ import { getAdServerRoutes } from "./modules/AdServer/AdServerLogic/routes/adSer
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { eventTrackerRoutes } from "./modules/EventTracker/routes/eventTracker.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
+import { initOpenTelemetry } from "./otel/index.js";
 import prismaPlugin from "./plugins/prisma.js";
 import { createFeedJob } from "./tasks/UpdateFeedJob.js";
 
@@ -26,6 +28,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 async function buildApp(options: AppOptions = {}) {
+	const { shutdown } = await initOpenTelemetry({ serviceName: "my-api-ts" });
+
+	const meter = metrics.getMeter("demo-meter");
+	const requestCounter = meter.createCounter("http_requests_total", {
+		description: "Total HTTP requests",
+	});
+	requestCounter.add(1, { route: "/feed", method: "GET" });
+
 	const fastify = Fastify({
 		logger: true,
 	}).withTypeProvider<TypeBoxTypeProvider>();
@@ -122,6 +132,10 @@ async function buildApp(options: AppOptions = {}) {
 	fastify.register(getAdServerRoutes);
 	fastify.register(getAdFormRoutes);
 	fastify.register(eventTrackerRoutes);
+
+	fastify.addHook("onClose", async () => {
+		await shutdown("fastify onClose");
+	});
 
 	return fastify;
 }
