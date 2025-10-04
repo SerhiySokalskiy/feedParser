@@ -15,6 +15,7 @@ import configPlugin from "./config/index.js";
 import { getAdFormRoutes } from "./modules/AdServer/AdForm/routes/adForm.route.js";
 import { getAdServerRoutes } from "./modules/AdServer/AdServerLogic/routes/adServer.route.js";
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
+import { eventTrackerRoutes } from "./modules/EventTracker/routes/eventTracker.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
 import { createFeedJob } from "./tasks/UpdateFeedJob.js";
@@ -111,13 +112,16 @@ async function buildApp(options: AppOptions = {}) {
 	});
 
 	await fastify.register(fastifyCors, {
-		origin: "*",
+		origin: ["http://localhost:5173"],
+		credentials: true,
+		methods: ["GET", "POST", "OPTIONS"],
 	});
 
 	fastify.register(getFeedDataRoutes);
 	fastify.register(authRoutes);
 	fastify.register(getAdServerRoutes);
 	fastify.register(getAdFormRoutes);
+	fastify.register(eventTrackerRoutes);
 
 	return fastify;
 }
