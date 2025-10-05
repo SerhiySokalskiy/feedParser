@@ -68,8 +68,6 @@ function escapeString(str: string) {
 export async function getEventsWithFilters(
 	fastify: FastifyInstance,
 	filters: EventFilters,
-	offset: { type: string },
-	limit: { type: string },
 ): Promise<TrackedEvent[]> {
 	try {
 		const conditions: string[] = [];

@@ -18,7 +18,6 @@ import { getAdServerRoutes } from "./modules/AdServer/AdServerLogic/routes/adSer
 import { authRoutes } from "./modules/Auth/routes/auth.route.js";
 import { eventTrackerRoutes } from "./modules/EventTracker/routes/eventTracker.route.js";
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
-import { initOpenTelemetry } from "./otel/index.js";
 import prismaPlugin from "./plugins/prisma.js";
 import { createFeedJob } from "./tasks/UpdateFeedJob.js";
 
