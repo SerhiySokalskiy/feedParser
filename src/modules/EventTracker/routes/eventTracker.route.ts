@@ -96,9 +96,7 @@ export async function eventTrackerRoutes(fastify: FastifyInstance) {
 			try {
 				const events = await getEventsWithFilters(
 					fastify,
-					filters,
-					offset,
-					limit,
+					filters
 				);
 				const agg_events = aggregateUniqueEvents(events);
 				return reply.send(JSON.stringify(agg_events));
@@ -141,8 +139,6 @@ export async function eventTrackerRoutes(fastify: FastifyInstance) {
 				const events = await getEventsWithFilters(
 					fastify,
 					filters,
-					offset,
-					limit,
 				);
 
 				const fields = Object.keys(events[0] || {});
