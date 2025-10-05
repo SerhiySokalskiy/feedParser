@@ -4,6 +4,7 @@ import { eventFiltersSchema } from "../schemas/eventTracker.schema.js";
 import { createEventTrackerService } from "../services/eventCache.service.js";
 import { getEventsWithFilters } from "../services/eventDB.service.js";
 import type { EventBatch, EventFilters } from "../types/event.types.js";
+import { aggregateUniqueEvents } from "../utils/agriigator.js";
 
 export async function eventTrackerRoutes(fastify: FastifyInstance) {
 	const eventBatchSchema = {
@@ -89,18 +90,12 @@ export async function eventTrackerRoutes(fastify: FastifyInstance) {
 			},
 		},
 		async (request, reply) => {
-			const { offset, limit, ...rest } = request.query;
-			const filters = rest as unknown as EventFilters;
-
+			const { ...filters } = request.query as unknown as EventFilters;
+			console.log(filters);
 			try {
-				const events = await getEventsWithFilters(
-					fastify,
-					filters,
-					offset,
-					limit,
-				);
-				// return reply.send(JSON.stringify(aggregateUniqueEvents(events)));  пока так не вывожу потому что ломается фронт
-				return reply.send(JSON.stringify(events));
+				const events = await getEventsWithFilters(fastify, filters);
+				const agg_events = aggregateUniqueEvents(events);
+				return reply.send(JSON.stringify(agg_events));
 			} catch (err) {
 				fastify.log.error(
 					"[EventTracker] Error fetching filtered events:",
@@ -133,16 +128,10 @@ export async function eventTrackerRoutes(fastify: FastifyInstance) {
 			},
 		},
 		async (request, reply) => {
-			const { offset, limit, ...rest } = request.query;
-			const filters = rest as unknown as EventFilters;
-
+			const { ...filters } = request.query as unknown as EventFilters;
+			console.log(filters);
 			try {
-				const events = await getEventsWithFilters(
-					fastify,
-					filters,
-					offset,
-					limit,
-				);
+				const events = await getEventsWithFilters(fastify, filters);
 
 				const fields = Object.keys(events[0] || {});
 				const parser = new Parser({ fields });

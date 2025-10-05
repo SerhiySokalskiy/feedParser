@@ -68,8 +68,6 @@ function escapeString(str: string) {
 export async function getEventsWithFilters(
 	fastify: FastifyInstance,
 	filters: EventFilters,
-	offset: { type: string },
-	limit: { type: string },
 ): Promise<TrackedEvent[]> {
 	try {
 		const conditions: string[] = [];
@@ -79,34 +77,25 @@ export async function getEventsWithFilters(
 			if (filters.eventType !== "all") {
 				conditions.push(`event_type = '${escapeString(filters.eventType)}'`);
 			}
-			fields.push("event_type AS eventType, ");
+			fields.push(" event_type AS eventType");
 		}
-		if (filters.dateFrom) {
-			conditions.push(
-				`toDate(timestamp) >= toDate('${escapeString(filters.dateFrom)}')`,
-			);
+		if (filters.pageUrl) {
+			if (filters.pageUrl !== "all") {
+				conditions.push(`page_url = '${escapeString(filters.pageUrl.trim())}'`);
+			}
+			fields.push(" page_url AS pageUrl");
 		}
-		if (filters.dateTo) {
-			conditions.push(
-				`toDate(timestamp) <= toDate('${escapeString(filters.dateTo)}')`,
-			);
+		if (filters.timestamp) {
+			fields.push(" timestamp AS timestamp");
 		}
-		if (filters.hourFrom !== undefined) {
-			conditions.push(`toHour(timestamp) >= ${filters.hourFrom}`);
+		if (filters.data) {
+			fields.push(" data");
 		}
-		if (filters.hourTo !== undefined) {
-			conditions.push(`toHour(timestamp) <= ${filters.hourTo}`);
+		if (filters.sessionId) {
+			fields.push(" session_id AS sessionId");
 		}
-
-		if (filters.adapter) {
-			conditions.push(
-				`JSONExtractString(data, 'adapter') = '${escapeString(filters.adapter)}'`,
-			);
-		}
-		if (filters.creativeId) {
-			conditions.push(
-				`JSONExtractString(data, 'creativeId') = '${escapeString(filters.creativeId)}'`,
-			);
+		if (filters.userAgent) {
+			fields.push(" user_agent AS userAgent");
 		}
 
 		const whereClause = conditions.length
@@ -116,18 +105,17 @@ export async function getEventsWithFilters(
 		const query = `
       SELECT
         ${fields}
-		session_id AS sessionId, page_url AS pageUrl, user_agent AS userAgent
       FROM events
       ${whereClause}
       ORDER BY timestamp DESC
-      LIMIT ${limit} OFFSET ${offset}
     `;
+		console.log(query);
 		const result = await fastify.clickhouse.query({
 			query,
 			format: "JSONEachRow",
 		});
-		const rows = (await result.json()) as TrackedEvent[];
 
+		const rows = (await result.json()) as TrackedEvent[];
 		fastify.log.info(`[EventDB] Fetched ${rows.length} events with filters`);
 		return rows;
 	} catch (err) {

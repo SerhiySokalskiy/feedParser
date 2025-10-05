@@ -42,12 +42,11 @@ export type EventBatch = TrackedEvent[];
 
 export interface EventFilters {
 	eventType?: string;
-	dateFrom?: string;
-	dateTo?: string;
-	hourFrom?: number;
-	hourTo?: number;
-	adapter?: string;
-	creativeId?: string;
+	timestamp?: string;
+	data?: string;
 	limit?: number;
 	offset?: number;
+	pageUrl?: string;
+	sessionId?: string;
+	userAgent?: string;
 }

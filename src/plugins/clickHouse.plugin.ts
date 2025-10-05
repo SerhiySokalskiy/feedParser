@@ -7,13 +7,10 @@ export default fp(async (fastify: FastifyInstance) => {
 
 	try {
 		clickhouse = createClient({
-			url: process.env.CLICKHOUSE_URL || "http://clickhouse-server:8123",
-			username: "default",
-			password: "",
-		});
-
-		await clickhouse.command({
-			query: "CREATE DATABASE IF NOT EXISTS mydb",
+			host: process.env.CLICKHOUSE_HOST || "http://localhost:8123",
+			username: process.env.CLICKHOUSE_USER || "default",
+			password: process.env.CLICKHOUSE_PASSWORD || "mypassword",
+			database: process.env.CLICKHOUSE_DB || "default",
 		});
 
 		await clickhouse.query({ query: "SELECT 1" });
