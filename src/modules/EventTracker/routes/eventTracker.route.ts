@@ -90,14 +90,10 @@ export async function eventTrackerRoutes(fastify: FastifyInstance) {
 			},
 		},
 		async (request, reply) => {
-			const { offset, limit, ...rest } = request.query;
-			const filters = rest as unknown as EventFilters;
+			const { ...filters } = request.query as unknown as EventFilters;
 			console.log(filters);
 			try {
-				const events = await getEventsWithFilters(
-					fastify,
-					filters
-				);
+				const events = await getEventsWithFilters(fastify, filters);
 				const agg_events = aggregateUniqueEvents(events);
 				return reply.send(JSON.stringify(agg_events));
 			} catch (err) {
@@ -132,14 +128,10 @@ export async function eventTrackerRoutes(fastify: FastifyInstance) {
 			},
 		},
 		async (request, reply) => {
-			const { offset, limit, ...rest } = request.query;
-			const filters = rest as unknown as EventFilters;
+			const { ...filters } = request.query as unknown as EventFilters;
 			console.log(filters);
 			try {
-				const events = await getEventsWithFilters(
-					fastify,
-					filters,
-				);
+				const events = await getEventsWithFilters(fastify, filters);
 
 				const fields = Object.keys(events[0] || {});
 				const parser = new Parser({ fields });
