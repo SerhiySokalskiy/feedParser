@@ -7,7 +7,7 @@ export default fp(async (fastify: FastifyInstance) => {
 
 	try {
 		clickhouse = createClient({
-			host: process.env.CLICKHOUSE_HOST || "http://localhost:8123",
+			url: process.env.CLICKHOUSE_HOST,
 			username: process.env.CLICKHOUSE_USER || "default",
 			password: process.env.CLICKHOUSE_PASSWORD || "mypassword",
 			database: process.env.CLICKHOUSE_DB || "default",
