@@ -121,7 +121,7 @@ async function buildApp(options: AppOptions = {}) {
 	});
 
 	await fastify.register(fastifyCors, {
-		origin: [fastify.config.CLIENT_URL],
+		origin: ["https://news-project-flame.vercel.app"],
 		credentials: true,
 		methods: ["GET", "POST", "OPTIONS"],
 	});
