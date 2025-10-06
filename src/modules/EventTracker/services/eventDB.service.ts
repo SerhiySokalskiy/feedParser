@@ -23,6 +23,11 @@ export async function insertEvents(
 				data: JSON.stringify(e.data),
 			})),
 			format: "JSONEachRow",
+			clickhouse_settings: {
+				max_memory_usage: "512000000",
+				max_threads: 2,
+				max_block_size: "65536",
+			},
 		});
 		fastify.log.info(
 			`[EventDB] Inserted ${events.length} events to ClickHouse`,
@@ -49,6 +54,11 @@ export async function getAllEvents(fastify: FastifyInstance) {
 		const result = await fastify.clickhouse.query({
 			query,
 			format: "JSONEachRow",
+			clickhouse_settings: {
+				max_memory_usage: "512000000",
+				max_threads: 2,
+				max_block_size: "65536",
+			},
 		});
 		const rows = await result.json();
 
@@ -113,6 +123,11 @@ export async function getEventsWithFilters(
 		const result = await fastify.clickhouse.query({
 			query,
 			format: "JSONEachRow",
+			clickhouse_settings: {
+				max_memory_usage: "512000000",
+				max_threads: 2,
+				max_block_size: "65536",
+			},
 		});
 
 		const rows = (await result.json()) as TrackedEvent[];
