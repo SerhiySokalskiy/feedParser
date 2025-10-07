@@ -24,7 +24,7 @@ export async function insertEvents(
 			})),
 			format: "JSONEachRow",
 			clickhouse_settings: {
-				max_memory_usage: "510000000",
+				max_memory_usage: "100000000",
 				max_threads: 1,
 				max_block_size: "65536",
 			},
@@ -55,7 +55,7 @@ export async function getAllEvents(fastify: FastifyInstance) {
 			query,
 			format: "JSONEachRow",
 			clickhouse_settings: {
-				max_memory_usage: "510000000",
+				max_memory_usage: "100000000",
 				max_threads: 1,
 				max_block_size: "65536",
 			},
@@ -124,7 +124,7 @@ export async function getEventsWithFilters(
 			query,
 			format: "JSONEachRow",
 			clickhouse_settings: {
-				max_memory_usage: "510000000",
+				max_memory_usage: "100000000",
 				max_threads: 1,
 				max_block_size: "65536",
 			},
