@@ -20,6 +20,7 @@ import { eventTrackerRoutes } from "./modules/EventTracker/routes/eventTracker.r
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route.js";
 import prismaPlugin from "./plugins/prisma.js";
 import { createFeedJob } from "./tasks/UpdateFeedJob.js";
+import { initOpenTelemetry } from "./otel/index.js";
 
 export type AppOptions = Partial<FastifyServerOptions>;
 
@@ -27,7 +28,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 async function buildApp(options: AppOptions = {}) {
-	//const { shutdown } = await initOpenTelemetry({ serviceName: "my-api-ts" });
+	const { shutdown } = await initOpenTelemetry({ serviceName: "my-api-ts" });
 
 	const meter = metrics.getMeter("demo-meter");
 	const requestCounter = meter.createCounter("http_requests_total", {
@@ -132,9 +133,9 @@ async function buildApp(options: AppOptions = {}) {
 	fastify.register(getAdFormRoutes);
 	fastify.register(eventTrackerRoutes);
 
-	//fastify.addHook("onClose", async () => {
-	//	await shutdown("fastify onClose");
-	//});
+	fastify.addHook("onClose", async () => {
+		await shutdown("fastify onClose");
+	});
 
 	return fastify;
 }

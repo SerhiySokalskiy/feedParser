@@ -2,9 +2,9 @@ export const registrationSchema = {
 	body: {
 		type: "object",
 		properties: {
-			name: { type: "string", minLength: 2 },
-			email: { type: "string", format: "email" },
-			password: { type: "string", minLength: 6 },
+			name: { type: "string", minLength: 2, default: "Name" },
+			email: { type: "string", format: "email", default: "example@gmail.com" },
+			password: { type: "string", minLength: 6, default: "dasjhdsa73413" },
 		},
 		required: ["name", "email", "password"],
 		additionalProperties: false,
@@ -26,8 +26,8 @@ export const loginSchema = {
 	body: {
 		type: "object",
 		properties: {
-			email: { type: "string", format: "email" },
-			password: { type: "string", minLength: 6 },
+			email: { type: "string", format: "email", default: "sokalskiyserhiy1@gmail.com" },
+			password: { type: "string", minLength: 6, default: "sokalskiy11" },
 		},
 		required: ["email", "password"],
 		additionalProperties: false,
