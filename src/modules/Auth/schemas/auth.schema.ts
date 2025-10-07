@@ -26,7 +26,11 @@ export const loginSchema = {
 	body: {
 		type: "object",
 		properties: {
-			email: { type: "string", format: "email", default: "sokalskiyserhiy1@gmail.com" },
+			email: {
+				type: "string",
+				format: "email",
+				default: "sokalskiyserhiy1@gmail.com",
+			},
 			password: { type: "string", minLength: 6, default: "sokalskiy11" },
 		},
 		required: ["email", "password"],
