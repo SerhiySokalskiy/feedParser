@@ -18,12 +18,12 @@ export const createAdBidSchema = {
 	body: {
 		type: "object",
 		properties: {
-			size: { type: "string" },
-			minCPM: { type: "number" },
-			maxCPM: { type: "number" },
-			geo: { type: "string" },
-			adType: { type: "string" },
-			frequency: { type: "integer" },
+			size: { type: "string", default: "300x250" },
+			minCPM: { type: "number", default: "100" },
+			maxCPM: { type: "number", default: "150" },
+			geo: { type: "string", default: "Ukr" },
+			adType: { type: "string", default: "banner" },
+			frequency: { type: "integer", default: 3 },
 		},
 		required: ["size", "minCPM", "maxCPM", "geo", "adType", "frequency"],
 		additionalProperties: true,

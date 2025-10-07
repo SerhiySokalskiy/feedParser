@@ -2,8 +2,12 @@ export const getFeedSchema = {
 	querystring: {
 		type: "object",
 		properties: {
-			url: { type: "string", format: "uri" },
-			force: { type: "string", enum: ["0", "1"] },
+			url: {
+				type: "string",
+				format: "uri",
+				default: "https://www.unian.ua/society/rss",
+			},
+			force: { type: "string", enum: ["0", "1"], default: "1" },
 		},
 		additionalProperties: false,
 	},
@@ -13,7 +17,7 @@ export const getArticleByIdSchema = {
 	params: {
 		type: "object",
 		properties: {
-			id: { type: "string" },
+			id: { type: "string", default: "68e53181739d6a3dc0f1dfd8" },
 		},
 		required: ["id"],
 		additionalProperties: false,
