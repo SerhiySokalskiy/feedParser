@@ -20,7 +20,7 @@ export function createFeedJob(fastify: FastifyInstance) {
 async function updateFeed() {
 	try {
 		const response = await fetch(
-			"http://localhost:3000/feed?url=https://rss.unian.net/site/news_ukr.rss&force=1",
+			"https://feedparser-bmte.onrender.com/feed?url=https://rss.unian.net/site/news_ukr.rss&force=1",
 		);
 		if (!response.ok) {
 			throw new Error(`Feed update failed with status ${response.status}`);
