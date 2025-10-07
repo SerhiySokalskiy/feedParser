@@ -26,7 +26,7 @@ export async function insertEvents(
 			clickhouse_settings: {
 				max_memory_usage: "100000000",
 				max_threads: 1,
-				max_block_size: "65536",
+				max_block_size: "10000",
 			},
 		});
 		fastify.log.info(
@@ -57,7 +57,7 @@ export async function getAllEvents(fastify: FastifyInstance) {
 			clickhouse_settings: {
 				max_memory_usage: "100000000",
 				max_threads: 1,
-				max_block_size: "65536",
+				max_block_size: "10000",
 			},
 		});
 		const rows = await result.json();
@@ -126,7 +126,7 @@ export async function getEventsWithFilters(
 			clickhouse_settings: {
 				max_memory_usage: "100000000",
 				max_threads: 1,
-				max_block_size: "65536",
+				max_block_size: "10000",
 			},
 		});
 
