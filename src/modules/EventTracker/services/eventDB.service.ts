@@ -24,9 +24,9 @@ export async function insertEvents(
 			})),
 			format: "JSONEachRow",
 			clickhouse_settings: {
-				max_memory_usage: "100000000",
-				max_threads: 1,
-				max_block_size: "10000",
+				max_memory_usage: "512000000",
+				max_threads: 2,
+				max_block_size: "65536",
 			},
 		});
 		fastify.log.info(
@@ -55,9 +55,9 @@ export async function getAllEvents(fastify: FastifyInstance) {
 			query,
 			format: "JSONEachRow",
 			clickhouse_settings: {
-				max_memory_usage: "100000000",
-				max_threads: 1,
-				max_block_size: "10000",
+				max_memory_usage: "512000000",
+				max_threads: 2,
+				max_block_size: "65536",
 			},
 		});
 		const rows = await result.json();
@@ -124,9 +124,9 @@ export async function getEventsWithFilters(
 			query,
 			format: "JSONEachRow",
 			clickhouse_settings: {
-				max_memory_usage: "100000000",
-				max_threads: 1,
-				max_block_size: "10000",
+				max_memory_usage: "512000000",
+				max_threads: 2,
+				max_block_size: "65536",
 			},
 		});
 
