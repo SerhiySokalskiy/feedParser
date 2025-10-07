@@ -35,7 +35,7 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
 						return { feed: feedFromDB };
 					}
 				}
-
+				
 				feed = await parseFeed(url);
 
 				await saveFeedToDB(fastify, feed);

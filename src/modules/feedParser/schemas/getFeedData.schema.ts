@@ -7,7 +7,7 @@ export const getFeedSchema = {
 				format: "uri",
 				default: "https://www.unian.ua/society/rss",
 			},
-			force: { type: "string", enum: ["0", "1"], default: "1" },
+			force: { type: "string", enum: ["0", "1"], default: "0" },
 		},
 		additionalProperties: false,
 	},
